@@ -1,7 +1,4 @@
-from app import app
 from database import database
-
-
 class Usuario(database.Model):
 
     __tablename__ = 'usuarios'
@@ -23,8 +20,7 @@ class Usuario(database.Model):
     )
 
     def validate(self):
-        # TODO: Implementar validações de campos
-        pass
+        return bool(self.usuario and self.senha)
 
     def login(self, request):
         return self.query.filter_by(usuario=request.form['usuario']).first()
