@@ -13,6 +13,9 @@ CATEGORIAS_VALIDAS = [
     'Pet Shop',
 ]
 
+TEMPLATE_PRODUTO_INSERT = 'produtos/insert.html'
+TEMPLATE_PRODUTO_EDIT = 'produtos/edit.html'
+ROTA_PRODUTO_LIST = 'produto.list'
 MSG_IDPRODUTO_INVALIDO = "Campo 'idproduto' é obrigatório e deve ser numérico."
 MSG_NOME_INVALIDO = "Campo 'nome' é obrigatório e deve ter no máximo 40 caracteres."
 MSG_QUANTIDADE_INVALIDA = "Campo 'quantidade' é obrigatório e deve ser numérico."
@@ -44,7 +47,7 @@ def validar_dados_produto(nome, quantidade, categoria):
 @login_required
 def insert():
     if request.method == 'GET':
-        return render_template('produtos/insert.html')
+        return render_template(TEMPLATE_PRODUTO_INSERT)
 
     nome = request.form.get('nome', '')
     quantidade = request.form.get('quantidade', '')
@@ -54,13 +57,13 @@ def insert():
 
     if erro:
         flash(erro)
-        return render_template('produtos/insert.html')
+        return render_template(TEMPLATE_PRODUTO_INSERT)
 
     model = Produto()
     model.insert(request)
     flash(MSG_PRODUTO_INSERIDO)
 
-    return render_template('produtos/insert.html')
+    return render_template(TEMPLATE_PRODUTO_INSERT)
 
 
 @app.route('/main/produtos/delete', methods=['POST'], endpoint='produto.delete')
@@ -70,19 +73,19 @@ def delete():
 
     if not idproduto_valido(idproduto):
         flash(MSG_IDPRODUTO_INVALIDO)
-        return redirect(url_for('produto.list'))
+        return redirect(url_for(ROTA_PRODUTO_LIST))
 
     model = Produto()
     produto = model.view(request)
 
     if produto is None:
         flash(MSG_PRODUTO_NAO_ENCONTRADO)
-        return redirect(url_for('produto.list'))
+        return redirect(url_for(ROTA_PRODUTO_LIST))
 
     model.delete(request)
     flash(MSG_PRODUTO_EXCLUIDO)
 
-    return redirect(url_for('produto.list'))
+    return redirect(url_for(ROTA_PRODUTO_LIST))
 
 
 @app.route('/main/produtos', methods=['GET'], endpoint='produto.list')
@@ -101,16 +104,16 @@ def edit():
 
         if not idproduto_valido(idproduto):
             flash(MSG_IDPRODUTO_INVALIDO)
-            return redirect(url_for('produto.list'))
+            return redirect(url_for(ROTA_PRODUTO_LIST))
 
         model = Produto()
         produto = model.view(request)
 
         if produto is None:
             flash(MSG_PRODUTO_NAO_ENCONTRADO)
-            return redirect(url_for('produto.list'))
+            return redirect(url_for(ROTA_PRODUTO_LIST))
 
-        return render_template('produtos/edit.html', produto=produto)
+        return render_template(TEMPLATE_PRODUTO_EDIT, produto=produto)
 
     idproduto = request.form.get('idproduto', '')
     nome = request.form.get('nome', '')
@@ -119,21 +122,21 @@ def edit():
 
     if not idproduto_valido(idproduto):
         flash(MSG_IDPRODUTO_INVALIDO)
-        return redirect(url_for('produto.list'))
+        return redirect(url_for(ROTA_PRODUTO_LIST))
 
     erro = validar_dados_produto(nome, quantidade, categoria)
 
     if erro:
         flash(erro)
-        return render_template('produtos/edit.html', produto=request.form)
+        return render_template(TEMPLATE_PRODUTO_EDIT, produto=request.form)
 
     model = Produto()
 
     if model.view(request) is None:
         flash(MSG_PRODUTO_NAO_ENCONTRADO)
-        return redirect(url_for('produto.list'))
+        return redirect(url_for(ROTA_PRODUTO_LIST))
 
     model.edit(request)
     flash(MSG_PRODUTO_ALTERADO)
 
-    return render_template('produtos/edit.html', produto=request.form)
+    return render_template(TEMPLATE_PRODUTO_EDIT, produto=request.form)
